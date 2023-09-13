@@ -4,6 +4,7 @@ const kommuneInput = document.getElementById("kommuneInput");
 const kommuneLoad = document.getElementById("kommuneLoad");
 
 const urlKommune = "https://api.dataforsyningen.dk/kommuner";
+let kommuner = null;
 
 const fetchKommuner = (apiUrl) => {
     return fetch(apiUrl).then(response => {
@@ -13,8 +14,9 @@ const fetchKommuner = (apiUrl) => {
 }
 
 const actionFetch = async () => {
-    const kommuner = await fetchKommuner(urlKommune).then(result => result);
-    return kommuner;
+    const kommunerLoaded = await fetchKommuner(urlKommune).then(result => result);
+    kommuner = kommunerLoaded;
+    return kommunerLoaded;
 }
 
 const fillDropDown = () => {
@@ -43,17 +45,18 @@ dropDown.addEventListener("change", () => {
 });
 
 kommuneLoad.addEventListener("click", () => {
-    const kommuner = actionFetch();
-
-    kommuner.then(result => {
-       result.forEach(kommune => {
-           if (kommune["navn"].toLowerCase() == kommuneInput.value.toLowerCase()) {
-               document.body.appendChild(document.createElement("br"));
-               const aTag = document.createElement("a");
-               aTag.href = kommune["href"];
-               aTag.innerText = kommune["navn"];
-               document.body.appendChild(aTag);
-           }
-       })
-    });
+    if (kommuner == null) {
+        actionFetch().then(result => {
+            kommuner = result;
+        });
+    }
+    kommuner.forEach(kommune => {
+        if (kommune["navn"].toLowerCase() == kommuneInput.value.toLowerCase()) {
+            document.body.appendChild(document.createElement("br"));
+            const aTag = document.createElement("a");
+            aTag.href = kommune["href"];
+            aTag.innerText = kommune["navn"];
+            document.body.appendChild(aTag);
+         }
+      });
 })
