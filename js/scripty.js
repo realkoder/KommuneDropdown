@@ -44,19 +44,26 @@ dropDown.addEventListener("change", () => {
     document.body.appendChild(aTag);
 });
 
-kommuneLoad.addEventListener("click", () => {
-    if (kommuner == null) {
-        actionFetch().then(result => {
-            kommuner = result;
-        });
-    }
-    kommuner.forEach(kommune => {
+const createLinkByInputKommune = (kommueList) => {
+    kommueList.forEach(kommune => {
         if (kommune["navn"].toLowerCase() == kommuneInput.value.toLowerCase()) {
             document.body.appendChild(document.createElement("br"));
             const aTag = document.createElement("a");
             aTag.href = kommune["href"];
             aTag.innerText = kommune["navn"];
             document.body.appendChild(aTag);
-         }
-      });
+        }
+    });
+}
+
+kommuneLoad.addEventListener("click", () => {
+    if (kommuner == null) {
+         actionFetch().then(result => {
+            kommuner = result;
+            createLinkByInputKommune(result);
+        });
+    } else {
+        createLinkByInputKommune(kommuner);
+    }
 })
+
